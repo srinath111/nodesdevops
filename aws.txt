@@ -1,0 +1,165 @@
+virtual meachine:
+virtual mecahine is a virtual environment that functions with its own cpu , memory etc .. is known as virtual environment.
+virtual meachine is also called as hypervisor
+
+advantages:
+!)reduce of resources
+2)security 
+3)high avalible
+4)reuse of the vm 
+5)costing saving
+
+
+
+what is cloud computing:
+cloud computing is ondeamd delivery of it resources over the inernet with pay-as-go -pricing module
+
+what is aws:
+aws standfor amazon web services
+aws is a secure cloud computing platform,it offerd on demand resources like compute capacity,storage,networking etc.. to improve the organization capacity.
+
+
+can you explain about service modules in cloud computing?
+
+there are three types of service modules 
+1)saas(software as a service)
+2)Iaas(infrastructue as a service)
+3)pass(platform as a service)
+
+IAAS:
+IAAs is cloud computing service module where user can ther rent or lease of it resources like:storage,compute cloud,networking.
+PASS:
+PAas is cloud computing service modeule here third party cloud proviers provied platform wehere user can deploy ,manage an application. without handling complex resources like storage,networking, compute cloud.
+saas:
+saas is cloud computing  service module ,6here applications are hosted and provided by third party cloud providers over the internet.
+
+
+cloud deployment modules:
+there are three types of cloud deployment modules:
+1)public cloud
+2)private cloud
+3)hybrid cloud
+
+1)public cloud:
+public cloud is deployment model , services are provided by third party cloud providers over the internet it is known as public cloud.
+somethird party cloud providers are:
+1)aws
+2)azure
+3)oracle
+4)gcp
+5)alibaba
+6)ibm
+7)redhat
+
+2)private cloud:
+private cloud it is a cloud deployment model, here cloud infrastructure are owned by the organization and can be host there websites from there.
+->private cloud is located at company or orgnazation location .
+3)hybrid cloud:
+ hybrid is combination of public and private cloud is known as hybrid cloud.
+many of the organization are using hybrid cloud .
+
+
+static website: we can host a web site with out data base is known as static website.
+dymanic website: we can hostt a web site with database is known as dymanic website or hosting
+                 -> dymanic website uses java,mysql data bases
+
+
+`webservice:
+
+webservice is a pice of software ,that makes it self avalibe on the internet is known as web server.
+
+webserver :
+weberver is a network service that delivers content to the client over the internet it is known as webserver
+e
+
+
+REGION:
+it is a physical location in the world ,THERE we have multipe avalible zones
+
+AVALIBLE ZONE:
+avalible zone is one or more descrite data center with compute power and reduence power .
+
+Data center:
+data center is looks like a rows and cloums with millions of physiCAl servers, here we can store over data ,for more then a years and deceas.
+
+edge location :
+
+edge location is designed for delivery of your servers with low latency
+
+
+what is aws vpcs:
+aws vpc stands for amazon web service virtual private cloud
+amazon vpc is virtual network space within the aws cloud,that enables you to launch aws resources into the virtual network space.
+
+vpc compomtes are:
+1)subnets
+2)routing tables
+3)internet gate way
+4)elastic ips
+5)vpc end points 
+6)nat gateway
+7)vpc peering 
+
+what is subnet?
+subnet is a network inside a network subent makes network more effiency
+-> each vpc network conists one or more ipaddres range is known as subnet
+.
+there are two types of subnets
+1)pulic subnet: for the resources we need internet ACCESS WE will uses public subnet
+
+2)private subnet:for the resources we no need internet access we will use private subnet
+
+ip address:
+ip address for internet protocol
+
+ip address is numerical label that is assigned to each and every device connect to the computer for the internet access is known as ip address.
+ 
+there are two types of ipaddress 
+1)ipv4:it is 32 bit address length,ipv4 uses four 1-byte decimal number devided by (.)  example: 10.2.3.4
+
+2)ipv6: it is 128 bit address length, ipv4 uses hexa decimal number seprated by (:) example: 1A3::e2f
+
+what is internet gate way?
+internet gate is hORIZONTAL SCALABLE AND HIGHLY AVALIBLE VPC COMPOENT INTERNET GATEwAY ALLOWS COMMUNiTION between your vpc  and the internet.
+
+explain about route tables?
+route tabel exists routes with in the target other thn internet gateway,network interface
+route table is a set rules that determine where network traffic is directed.
+one or more ip address together it is known as subnet assoation.
+ 
+what is routing:
+ select a best path from the existing policy and pre-determine rules
+
+
+what is security group?
+security acts as a virtual firewall that control the traffic at instance level.
+it consists of some set of rules,that can control the incoming and outgoing traffic.
+
+keypair:
+keypair is combination of public key and parivte key.
+keypair used to secure login access to aws ec2 instance.
+public key is used to encrypt your data and private key is used to decrypt the data.
+
+what is vpc peering?
+->vpc perring is communication between one or more  vpcs.
+->ip addrress should not overlap.
+->vpc peering  can be one region to another region
+->vpc peering can be one accout to another account
+->vpc perring should be one to one communition.
+
+nat gateway?
+nat gateway stands for network address translate
+nat gate way is used to provied internet access to the private subnet.
+for databases,storges we no need internet access for that we will used private subnet, if we want to update over application we need internet for that we will used nate gate way.
+
+->nat gateway will not allow the internet in to the private subnet.
+->if private subnet is sending a requsest  to internet,and replay from the internet will allowed by the natgate way.
+
+elastic ip address?
+elastic ip address is static ipv4 address desined for dynamic cloud computing.
+ 
+elastic ip address is a reserved public ip address that you can assign to any ec2 instance in particular until you relase it.
+
+nacl(network access control list0?
+nacl is an optional of security for your vpc subnet that acts as virtual firewall for controlling incoming and outgoing traffic of one or more subnets.
+

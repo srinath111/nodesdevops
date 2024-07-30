@@ -1,0 +1,575 @@
+terraform :
+terraform is a open source software created by hashi crop.using go programming lanungae.
+terraform is a infrastructure as a code(IAC) tool it used to build,edit and manage your infrastructure safely and effectly.
+terraform support multiple provider (aws,azure,GCP,alibaba,oracle cloud,etc..)
+terraform code is reusable for differnt infrastructure.
+
+what is iac:
+IAC stands for infrastructure as a code used to deploy and manage your infarastructure using configuration files.
+advantages of iac:
+1)speed
+2)cost
+3)recreate you infrastructure
+mininum risk
+everything codeified
+
+IAC tools are:
+ansible
+puppet
+terraform
+
+advantages of terraform:
+1)before deploy it provide dry run of the code ->dry run
+2)understanding the code is eassy.
+3)code can be reused.
+5)deploying time it will take less time
+6)improt of existing and manually created resource.
+
+disadvantages of terraorm:
+1)it is third party tool
+2)it provides update a new tool ,it will take some time for updating in terraform tool.
+
+
+terraform architure:
+1)terraform code
+2)terrform init
+3)terraform plan
+4)terrform apply
+
+terraform init: it will download the plugin of the provider ,
+terrform plan: it will dry run the code
+terraform apply: it will deploy your infrastructure.
+
+
+provider:
+provider is responsible for understanding api interaction and expose resource.
+terraform supports multiple provider.
+depending what type of infrastructure you are going to create we need to specify the details of that provider.
+ example: if you are going to create aws we need to provide aws details
+in provider block we need to specify the access and secrte keys 
+
+provider plugins:
+when we do terraform init it will download the plugins of provider .
+provider is a plugin that  terraform manage an external api
+
+resource:
+resource will discribes one or more infrastructure objects.
+resource block:
+resource will decleares the resource type and local name to the resource.
+
+impalicity:
+resource may reference to another resource in the terraform code.
+syntax:"${resoucetype.local name.id}"
+expalicity:
+resource will be create first where we give depondon in another resource it create first and then it will cretae another resouce.
+depond_on = [resourcetype.localname]
+
+state file:
+it stores the information about the resource or infrastructure it has created,stored in terraform state file.
+if we lose the state file we cannot updaTE OUR RESOURCE .
+IN STATE FILE CODE IS SAVED IN JSON FORMAT FOR EASSY READIBLE.
+desired state:
+what ever code we writen in the configuration file it is konwn as desired state.
+what you write in the terrform file is known as desired state.
+terraform resposiblity is to create the resources mentained in desired state .
+before applying the it will compare the difference between current state and desired state.
+
+
+current state is called aws cloud
+
+
+provide versioning:
+there are multiple ways for specifing the version of the provider and terraform version66.
+">=1.0" -> greater  then or equal to the version.
+"<=1.0"  ->less than or equal to the version
+">=2.0,<=2.8" -> take any version between the 2.0 to 2.8
+provide versioning in two ways:
+
+1)we can provide versioning in provider block.
+ex: provider "aws"{
+	access_key= " "
+	secret_key = ""
+	region = "".
+	version = " "
+    } 
+2)we can provide versioning in nested form.
+ terraform{
+	required_version = "it is terraform version" 
+	required_provider{
+	    aws={
+		version = "aws version"  ex:"<=2.0"
+		source = "hashicorp/aws"
+}
+}
+}
+
+what are the ways to pass access_key and secret_key :
+
+1)using environmental varibles:
+export "aws_access_key="
+export "aws_secret_key="
+2)using terraform variables
+   we .can pass access_key and secret_key form the terrform variable files.
+   ex:variables.tf
+3)COfiguration files:
+	we can access it from he configuratioN files
+    provider "Aws"{
+	share_config-files= ["users/tf-users/.aws/conf"]
+	share-CredentiaLs-files=["/user/tf-users/.aws/conf"]
+}
+
+output values:
+ make information about infrastructure avalible on command line and can expose to information for other terraform configuration to use.
+  
+ example:
+  output "srinath"{
+	value="${aws_instamce.instance.public1.ip}"
+}
+
+
+
+terraform variables:
+ variables are tempory memory location.
+variables are used to store the values than values can be reused in the entire infrastructure or terraform project
+we can maintain seprate file for variables.
+wecan pass variables in diffrent ways.
+1)environment variables:using export we can pass over environment variables before plan.
+2)default variables:
+3)variables file:we can maintain our variables in sperate file (terraform.tfvars)
+  terraform plan --var-file "filename"
+  ex:
+  terraform plan --var-file "terraform.tfvars"
+4)command line flags:pass our variables from the command line
+    terraform plan --var="instacetype=t2.micro"
+
+
+data types:
+string:sequence of unicode character represent some txt,like 
+   {
+	 type= string
+          "srnath"
+}
+maps:group of values are identifed by key-value pair.
+      key is used to access the value
+   eample:
+   type=map
+   { srinath = "koraboina" , age=20}
+
+number :type=number
+         default= 3
+
+list:list is same as array,we can store multiple values,remember that the first value start with "0" postion.
+ example:
+{
+type = list
+default= ["sri","sra","sro"]
+}
+
+
+terraform functions:
+terrform language support multipe built-in function,that are used to transform and combine values.
+some predfine functions are:
+numeric
+string
+collection
+endcoing
+filesystem
+data and time
+
+
+length:
+it is used to count the length of the string/list
+
+example=
+count = "${var.publicax}"
+ex2:
+  length["a","b","c"]
+    o/p: 3
+
+element:
+element is used to retrives a single element from a list
+
+rember that value start with "0".
+or 
+the index is zero based.this function provides error if used with an empty list.the index number must be a non-negative number.
+syntax:
+   element(list,index)
+
+example:
+element(["a","b","c"],2)
+ o/p:
+   c
+
+example:
+element(["a","b","c"],1)
+ o/p:
+   b
+
+splat:
+A splat expression allows us to get a list of all the altributes
+
+syntax: "*"
+   
+
+example:sapose we have a list, we need to wrie a code for each index,inplace of writing code we will use "*".
+"*" it will repet the index until list index completed.
+ 
+"${element(aws_subnet.publicsubnet.*.id,count.index)}"
+
+
+lookup:
+lookup is used to retrive single element from the map is known as lookup
+ syntax:
+  lookup(map,key,default)
+
+example1:
+provider "aws" {
+    access_key = var.accesskey
+    secret_key = var.secretkey
+    region = var.reg
+}
+resource "aws_instance" "awsins"{
+    count = "${var.env == "dev"?1:0}"
+    ami = "${lookup(var.amis,var.reg)}"
+    instance_type = "${var.env == "deg"?"t2.nano":"t2.micro"}"
+    key_name = "vpc-NAT"
+
+}
+
+variables.tf
+variable "accesskey"{
+    default = ""
+}
+variable "secretkey"{
+    default = ""
+}
+variable "reg"{
+    default = "us-east-1"
+}
+#variable "hk"{}
+variable "env"{
+    default = "dev"
+}
+variable "amis"{
+    type = map
+    default = {
+        us-east-1 = "ami-0440d3b780d96b29d"
+        us-east-2 = "ami-02ca28e7c7b8f8be1"
+    }
+}
+
+
+
+
+conditional expression:
+ conditional expression used the value as boolean expression to select one of two values.
+
+  syntax:
+     condition ? true_value:false_value
+example:
+provider "aws" {
+    region = var.reg
+    access_key = var.accesskey
+    secret_key = var.secretkey
+}
+resource "aws_instance" "awsins"{
+    count = "${var.env == "dev"?2:0}"
+    ami = "${lookup(var.amis,var.reg)}"
+    instance_type = "${var.env == "deg" ? "t2.nano":"t2.micro"}"
+    key_name = "vpc-NAT"
+
+}
+
+resource "aws_instance" "awskls"{
+    count = "${var.env == "dev"?1:0}"
+    ami = "${lookup(var.amis,var.reg)}"
+    instance_type = "${var.env == "deg" ? "t2.nano":"t2.micro"}"
+    key_name = "vpc-NAT"
+
+}
+
+variables.tf
+
+variable "accesskey"{
+    default = ""
+}
+variable "secretkey"{
+    default = ""
+}
+variable "reg"{
+    default = "us-east-1"
+}
+#variable "hk"{}
+variable "env"{
+    default = "dev"
+}
+variable "amis"{
+    type = map
+    default = {
+        us-east-1 = "ami-0440d3b780d96b29d"
+        us-east-2 = "ami-02ca28e7c7b8f8be1"
+    }
+}
+
+count:
+it used to increase(OR)creation of multipe resource without repting the same code for multiple times in the terrafom configuration file or project.
+example:
+
+provider "aws"{
+    region = "us-east-1"
+    access_key = ""
+    secret_key = ""
+}
+resource "aws_instance" "awsi"{
+    count=3
+    tags ={
+        Name = "sri.${count.index}"
+    }
+    ami= "ami-0e731c8a588258d0d"
+    instance_type = "t2.micro"
+}
+
+
+
+count.index:
+it will increse the resoure name depnding(OR)accoding on(OR)to the count
+
+example:
+provider "aws"{
+    region = "us-east-1"
+    access_key = ""
+    secret_key = ""
+}
+resource "aws_instance" "awsi"{
+    count=3
+    tags ={
+        Name = "sri.${count.index}"
+    }
+    ami= "ami-0e731c8a588258d0d"
+    instance_type = "t2.micro"
+}
+
+
+
+local values:
+ it is used to assigns a name to an expression,allowing it to be used multiple times within modules(or)resource with out repeating it.
+example:
+ 
+locals{
+ common_tags={
+ owner = "DEVOPS tem"
+  DEV = "sr"
+}
+}
+
+
+resource "aws_instance" "instance"{
+  		ami = ""
+ 		instance_type=""
+		tags= local.comman_tags
+}
+
+resource "aws_instance" "instance1"{
+  		ami = ""
+ 		instance_type=""
+		tags= local.comman_tags
+
+
+taint or tainting:
+==================
+it is used to manually mark a resoure for recreation.
+the command is 
+trraform taint resource_name
+
+aNULL resource:
+null resource implement the standard resource lifecycle,but it takes no further action.
+
+provisioners:
+provisioners are used to run(OR)exectue scripts on the local/remote meachine , when resource is creating or destroing.
+
+there are two types of provisioners 
+1)local exec provisioners
+2)remote exec provisioners
+
+local exec provisioners:
+local exec provisioners allows us to invoke or call locally exectuable when resource creation is completed.
+
+remote exec provisioners:
+remote exec provisioners allows us to invoke or call scripts directly on the remote server.
+remote exec provisioners required a connection and supports of both ssh and winrm.
+
+
+
+there are two primary types of provisioners.
+
+1)creation time provisioners ->creation time provisioners are run only on when the the resource is creating ,not on updating or destroying.
+
+2)destory time provisioners -> destory time provisioners are run when the resource is destroying.
+example for destory time provisioners:
+provisioner "local_exec" {
+  when = destroy
+ command = << EOH
+  echo "${aws_instance.instance.public.ip "} >> details && echo "${aws_instance.instance.private.ip "} >> details,
+ EOT
+}
+
+
+FAILOVER BEHAVIOR:
+there are two types of fail over behavior
+1)continue -> when we are creating resources we get error,we can ignore the error using on_failure = continue
+
+2)fail: raise an error when we are creating a resources or destoring the resource ,it stop when the error triggers.
+
+
+life cycle:
+
+prevent_destory:
+ if any one is trying to destory your resorces(OR) infrastructure ,we can protect over resource using prevent_destory
+example:
+resource "aws_s3_bucket" "sri"{
+  bucket = "srinathk1324"  #change bucket name when you are doing create before destroy
+  lifecycle{
+     prevent_destroy = true
+    }
+}
+
+
+create_before_destroy:
+       it will create a new resource and destory a old resource, it is used when you give diffrent name or any thing.
+example:
+resource "aws_s3_bucket" "sri"{
+  bucket = "srinathk1324"  #change bucket name when you are doing create before destroy
+  lifecycle{
+        create_before_destroy = true
+      }
+}
+
+
+ignore_changes:
+it will ignore the changes done on the current state.
+it will refresh the server
+example:
+resource "aws_s3_bucket" "sri"{
+  bucket = "srinathk1324"  #change bucket name when you are doing create before destroy
+  lifecycle{
+    ignore_changes = true
+  }
+}
+
+terraform module:
+modules are container for multiple resource that are used togeather.
+we no need to repeat the code regulary.
+we can create multiple resource using  child modules
+we need to change the variables details in the child modules.
+
+
+accessing child module outputs:
+in parent module ,output of the child modules are avalible in expression call as( module <modulename>. <outputname>)
+
+
+
+
+
+to destory only one resource :
+ method1:
+terraform destroy -target=resource name
+method 2:
+remove resource from the state file
+terraform state rm resource name
+
+
+
+IMPORTING of resources:
+if created are instance maually we need to import from the current state to desired state
+importing command
+terraform import resource name
+
+
+terraform workspce:
+terraform allows us to create multiple workspace,with each workspace we can define different set of variables.
+
+
+terrform create a workspce for dev
+terraform workspace new workspce name
+terrafom to see the list of work space
+terrform workspace list
+to move from one workspace to another workspace
+terraform workspace select workspace_name
+to rm the work space
+  terraform workspace rm workspace_name
+to see the default workspce
+terrform workspace show
+
+
+
+data source;
+data source allows data(user) to fetched or computed for use ,elsewhere in the terraform configuration.
+   or
+data source allows data(user) to fetched or computed data for use ,used that data elsewhere in the terraform configuration
+ or 
+data source bring data from the aws and that data can be used anywhere in the terraform configuration.
+   fetched ->go for and then bring back.
+example:
+data "aws_ami" "app_ami"{
+most_recent = true
+owners = ["amazon"]
+filter{
+name = "name"
+values = ["amzn2-ami-hvm*]
+}
+}
+
+resource "aws_instance" "instance1"{
+ami = data.aws_ami.app_ami.id
+instance_type = "t2.micro"
+}
+
+debugging in terraform:
+terrform has detailed logs which  can be enables by setting the TF_LOG environment variable to any value.
+you can set TF_LOG to one of the log level TRACE,DEBUG,INFO to change verbosity of the logs.
+TRACE is the default log for TF_LOG
+
+command is to see the logs:
+export TF_LOG = TRACE
+to save the logs
+export TF_LOG_PATH = /tmp/terraform-crash.log
+
+terraform backend management :
+terrform backend stores the terraform state data file in the s3 bucket or local.
+example:
+terraform {
+ backend{
+	bucket= ""
+	file= "file name"
+}
+}
+
+
+Terraform Show
+The terraform show command is used to provide human-readable output from a state or plan file.
+
+state locking :
+if two member are uploading the code into the state file ,the is possible to crash the state file.
+to protect from the crash ,we will integrate dynamodb table to s3,
+after integration if any one is uplading the state file it will show the delatils of another person ,so he can contact with the person and after complection his st
+
+
+
+resource "aws_dynamodb_table" "dynamodb-terraform-lock" {
+   name = "terraform-lock"
+   hash_key = "LockID"
+  
+   attribute {
+      name = "LockID"
+      type = "S"
+   }
+
+
+terraform {
+    backend "s3" {
+        bucket = "jhooq-terraform-s3-bucket"
+        key    = "jhooq/terraform/remote/s3/terraform.tfstate"
+        region     = "eu-central-1"
+       dynamodb_table  = "terraform-lock"
+    }
+} 

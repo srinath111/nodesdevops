@@ -1,0 +1,772 @@
+configuration management:
+this is the proccess of configuring multiple servers from one point of control.
+advantages:
+  1)provisioning of servers
+		setup of ther software on server can be done very easly from one point.
+  2)redution of usage of reources
+	less amount of time ,ammount and human resorces
+  3)distory recovery
+  4)good performance
+popular configuration managment are:
+ ansible
+ chef
+ puppet
+
+ansible:
+->ansible is a open source configuration managment   created using python.
+->the main meachine where ansible is install is known as control and the remaning remote server are known as managed nodes/hosts.
+->from the controller to managed should be password less ssh connectivity.
+->ansible is a software to deploy an application using ssh without any downtime.
+->ansible is called as "agentless".
+
+1)free of cost
+2)flexible
+3)scalible
+4)high performance
+5)integration with other tools
+
+why ansible:
+ansible can be used in it infrastructure to manage and deploy software applications to remote nodes.
+
+
+different types of ansible:
+ 1)adhoc commands
+ 2)playbooks
+ 3)roles
+  
+
+adhoc commands:
+ adhoc commands used to run individually to perform quck actions.
+  
+coomands:
+ this is used to execute linux commands on the remote managed nodes.
+
+shell: 
+this is used to execute shell scripts on the remote managed notes.
+
+user:
+thi1s is used to perform used administration access on the remote managed servers
+  like creating user and password.
+
+file : 
+used to create files or directories on the remote managed nodes.
+
+copy:
+used to copys files/directories from controller to managed nodes
+
+fetch: 
+used to copy files/directories from managed nodes to controller.
+
+apt:
+apt is used to install software packages/application on remote managed server.
+  like: installing ,deleting,updating
+
+yum:
+yum module is used to install softare packages/application on the remote managed nodes.
+
+service:
+service module is used to stop,start,restart services on the remote managed nodes.
+
+uri:
+uri module is used to check the url response of remote managed nodes is reachable or not.
+
+git :
+git is used to install git version to remote managed nodes.
+
+get_url:
+get url is used to download files from the remote servers to remote managed nodes.
+
+stat:
+stat is used to caputure the detailed information about files/directories on the managed nodes.
+
+debug:
+used to display the output in json formated file.
+
+include:
+used to call child playboks from the parent playbook
+
+replace:
+replace is used to change port number on remote managed nodes.
+
+adhoc command:
+  adhoc command is used to run commands individually to perform quick actions.
+
+adhoc cammand syntax:
+  ansible all/ipaddress/groupname -i path of inentry -m module_name -a arguments -b
+
+inventry  file:
+it is used to stored the ipaddress of remote managed .
+default inventory file path:
+   /etc/ansible/hosts
+
+ -b is used to execute commnds on the superuser(sudo) it has higher previlages
+       -b become
+
+
+
+user module:
+this is used to perform used administration access on the remote managed servers
+  like creating user and password.
+
+ useradd->to create user
+ usermod -> it is used to modifie file
+ userdel-> it is used to delete user.
+ 
+example1:
+create user
+ansible all -m user -a "name = srinath password = sri" -b
+
+example2:
+create user with name,password,uid,home,shell,comment,state
+ansible all -m user -a "name = srinath  password = sri uid = 12345 home=/home/ubuntu/anu shell=/bin/bash comment= "A normal user" state=present " -b 
+ 
+state = present -> it is used to modify the user.
+        absent -> it is used to delete user  .
+command module:
+ it used to execute linux commands
+   
+example1:
+ ansible all -m command -a "free -m"
+example2:
+ansible all -m command -a "systemctl start nginx"
+
+shell module:
+ it is used to run shell scripts on the remote managed nodes.
+
+ example1:
+ install docker using adhoc command
+ ansible all -m shell -a " link of docker"
+
+ ansible command to store the memory info of all managed nodes in file
+  ansible all -m shell -a "free -m >>file1"
+
+file module:
+it is used to create files/directories on the remote managed.
+    state = touch -.it is used to create files
+            absent -> it is used to delete the files on directories
+            directory -> it is used to create directories
+  example1:
+   create file in the remote managed nodes
+    ansible al -m file -a "name=/tmp/srin state=touch"
+  exampe 2:
+    create directory in he remote managed noedes
+    ansible all -m file -a "name=/tmp/sri state=directory"
+ example 3:
+  create file and change file permission on the managed nodes
+   ansible all -m file -a "name=srinath dest=/tmp chmod=0777" -b
+
+copy module:
+ copy module is used to copy files from controller to remote managed nodes
+  src-> source path
+  dest-> destination path
+ owner: default owner
+ example1:
+    copy files from src to dest
+     ansible all -m copy -a "src = "current working directory file" dest="path of the destination" "
+  
+  copy files and change file permission on the managed nodes
+   ansible all -m acopy -a "src=srinath dest=/tmp chmod=0777 owner=root group=sai" -b
+
+apt module :
+ it is used to download the software or packages on the remote managed nodes.
+   state: present-> install software
+          absent-> delete software
+          latest -> upgrating to the latest version
+example1:
+install tree on the remote managed nodes
+ansible all -m apt -a "name=tree state= present" -b
+
+
+service:
+it is used to start,stop,restart on the remote managed nodes
+  state: started->it is used to start the container
+         restarted-> it is used to restart the container
+         stoped-> it is used to stop the container
+
+ example1:
+  start the nginx container
+  ansible all -m service -a "name=nginx state=started" -b
+
+get_url:
+it is used to download the files from the remote servers to remote managed nodes.
+    url: url of the file
+  dest: destination path
+ 
+example1:
+  ansible all -m get_url -a "url= "url path" dest=/tmp" -b
+
+uri:
+it is used to check the url response of remote managed nodes
+ state_code = 200
+ url: url response
+example:
+ ansible all -m url -a "url= https://google.com status_code=200" -b
+
+git:
+it is used to downlonad the files from git version to remote managed nodes
+repo:url of git version
+dest:destinoation path
+
+exampl1:
+ansible all -m git -a "repo=https://github.com/marvicsr/singleinstace dest=/tmp" -b
+
+replace:
+it is used to reset port or files on the remote managed nodes.
+
+regexp: current port
+replace: replaced port number
+dest: destionation path
+
+example1:
+  ansible all -m replace -a "name=nginx rgexp=8080 replace=9090 dest= /usesr" -b
+
+ansible playbooks:
+ list of task that exquate on the specified ipaddress or managed hosts.
+ playbooks created using ymal or yml file,each playbook contain multiple plays,a plays contain diffrent modules ,and the code can be reused form diffrent apllication.
+ ansible playbooks are designed to work on single hosts or group of hosts
+
+example1:
+install all apache with diffrent modules
+vim user.yml
+ ---
+- name: install appache2
+  hosts: all
+  tasks:
+    - name: install appache2
+      yum:
+        name: httpd
+        state: present
+    - name: create index.html
+      copy:
+        content: "hai all"
+        dest: /var/www/html/index.html
+    - name: restart start and enable
+      service:
+        name: httpd
+        state: restarted
+    - name: check url
+      uri:
+        url: http://10.1.2.124
+        status_code: 200
+    - name: check url
+      uri:
+        url: http://10.1.2.240
+        status_code: 200
+    - name:
+      service:
+        name: httpd
+        enabled: false
+...
+
+
+example2:
+vim chomd.yml
+---
+- name: change permisions
+  hosts: all
+  become: true
+  become_user: root
+  tasks:
+    - name: see the file is present or not
+      stat:
+        path: /tmp/f1
+      register: a
+    - name: check the out put
+      debug:
+        var: a
+    - name: change file permisions 0644 to 0777
+      file:
+        name: /tmp/f1
+        mode: 644
+      when: a.stat.executable==true
+
+
+check the  permisions is changed or not of chmod.yml
+
+---
+- name: check the  permisions is changed or not of chmod.yml
+  hosts: all
+  become: true
+  become_user: root
+  tasks:
+    - name: see the file is present or not
+      stat:
+        path: /tmp/f1
+      register: a
+    - name: check the out put
+      debug:
+        var: a
+
+ex:2
+vim .createuser.yml
+
+---
+- name: create user
+  hosts: all
+  tasks:
+    - name: create user
+      user:
+        name: srintk
+        uid: 123456789
+        password: 1234
+        shell: /bin/bash
+        comment: "a normal user"
+
+ex3:
+      yum:
+        name: tomcat9
+        state: present
+        update_cache: yes
+    - name:
+      copy:
+        src: tomcat-users.xml
+        dest: /etc/tomcat9/
+    - name: change the port number
+      replace:
+        regexp: 8080
+        replace: 9090
+        path: /etc/tomcat9/server.xml
+    - name:
+      service:
+        name: tomcat9
+        state: restarted
+    - name: pause
+      pause:
+        minutes: 2
+    - name:
+      uri:
+        url: http://10.1.2.240
+        status_code: 200
+    - name:
+      uri:
+        url: http://10.1.2.124
+        status_code: 200
+...
+
+
+vim tomcat-user.xml
+<tomcat-users>
+
+    <user username="srinath" password="123456" roles="manager-script"/>
+</tomcat-users>
+
+vim 
+
+
+
+
+variables:
+variables are tempory memory loction.
+variables are used to store vaules than can be reused any number of times in your project.
+there are three types of variables:
+ 1)global scope variable
+2)host scope variable
+3)playscope variable
+
+global scope variables:
+ it used to give values from the command line using "--extra-vars" and the code can be reuse for another project
+  global scope has higher peritory.
+
+  example1:
+vim hostscope.yml
+---
+- name: installing s/ware
+  hosts: all
+  tasks:
+    - name:
+      yum:
+        name: "{{a}}"
+        state: "{{b}}"
+        update_cache: "{{c}}"
+    - name:
+      service:
+        name: "{{a}}"
+        state: "{{d}}"
+        enabled: "{{e}}"
+...
+
+comand to execute the file with --extra-vars
+ ansible-playbook -f hostscope.yml --extra-vars "a=nginx b=present c=yes d=restarted e=true" -b
+
+
+example2:
+vim globalscope2.yml
+---
+- name: variables global scope
+  hosts: all
+  tasks:
+    - name:
+      yum:
+        name:
+          - "{{a}}"
+          - "{{b}}"
+          - "{{c}}"
+        state: "{{d}}"
+    - name: start and enable httpd
+      service:
+        name: "{{a}}"
+        state: "{{e}}"
+        enabled: "{{f}}"
+    - name: create web content
+      copy:
+        content: "{{g}}"
+        dest: "{{h}}"
+...
+
+ansible-playbooks globalscope2.yml --extra-vars "a=nginx b=tree c=net-tools d=present e=restarted e=true g ="awebwserver" h= /usr/share/hnginx/html" -b
+
+
+playscope:
+ varables are defined within the playbooks and it has least priority.
+
+examples:
+vim playscope.yml
+---
+- name: varibales playscope
+  hosts: all
+  vars:
+    - a: httpd
+    - b: firewalld
+    - c: perl
+    - d: latest
+    - e: restarted
+    - f: true
+    - g: "hai welcome to ansible"
+    - h: /var/www/html/index.html
+  tasks:
+    - name:
+      yum:
+        name:
+          - "{{a}}"
+          - "{{b}}"
+          - "{{c}}"
+        state: "{{d}}"
+    - name: start and enable httpd
+      service:
+        name: "{{a}}"
+        state: "{{e}}"
+        enabled: "{{f}}"
+    - name: create web content
+      copy:
+        content: "{{g}}"
+        dest: "{{h}}"
+...
+
+ansible-playbook playscope.yml -b
+
+
+host scope:
+ host scope are two types 
+1)variables to work on single host
+2)variables to work on groupof hosts
+
+variables to work on single host:
+  these variables are created in a dirctory known as "host_vars"
+  the directory is to created  where playbooks are presennt.
+   
+example
+vim host.yml
+---
+- name: host scope variable single
+  hosts: 10.1.2.240
+  tasks:
+    - name: to create user
+      user:
+        name: "{{a}}"
+        password: "{{b}}"
+        uid: "{{c}}"
+        home: "{{d}}"
+        shell: "{{e}}"
+        comment: "{{f}}"
+        state: "{{g}}"
+...
+
+create a directory name is host_vars
+ mkdir host_vars
+ 
+go to the folder and create a file with name or ip adress
+cd host_vars
+vim 10.2.3.8
+
+a: sri
+b: srinr 
+c: 12345
+d: /home/ubuntu/
+c: /bin/bash
+e: "a normal user"
+f: present
+
+example2:
+---
+- name: host scope variable single
+  hosts: 10.1.2.240
+  tasks:
+    - name: to remove user
+      user:
+        name: "{{a}}"
+        state: "{{b}}"
+        remove: "{{c}}"
+...
+
+vim 10.222.3.4
+---
+a: srinathkl
+b: absent
+c: true
+...
+
+
+variables to work on group of hosts;
+these variables are created in a dirctory known as "group_vars"
+  the directory is to created  where playbooks are presennt.
+
+vim sri.yml
+---
+- name: hostscope variables
+  hosts: webserver
+  tasks:
+    - name: toinstall httpd
+      yum:
+        name:
+          - "{{a}}"
+          - "{{b}}"
+          - "{{c}}"
+        state: "{{d}}"
+    - name: to create index.html
+      copy:
+        content: "{{e}}"
+        dest: "{{f}}"
+    - name: to restarted and enable
+      service:
+        name: "{{a}}"
+        state: "{{g}}"
+        enabled: "{{h}}"
+...
+
+
+
+vim webserver.yml
+---
+a: httpd
+b: firewalld
+c: perl
+d: absent
+e: "hai world i am with you"
+f: /var/www/html/index.html
+g: restarted
+h: false
+...
+
+
+loops:
+loops are used repat any task or part of the code multiple times when used
+with_item,with_sequenies
+
+exampl1:
+---
+- name: creating loops
+  hosts: all
+  tasks:
+    - name: install multiple software
+      yum:
+        name: "{{item}}"
+        state: absent
+        update_cache: no
+      with_items:
+        - tree
+        - httpd
+        - git
+...
+
+example2:
+---
+- name: alternative ways to create loops
+  hosts: all
+  tasks:
+    - name: install softwares
+      yum:
+        name: [ "tree","git"]
+        state: absent
+        update_cache: no
+...
+
+ex3:
+---
+- name: install multiple softwares
+  hosts: all
+  become: true
+  become_user: root
+  tasks:
+    - name: install multiple software
+      yum:
+        name: "{{item.a}}"
+        state: "{{item.b}}"
+        update_cache: "{{item.c}}"
+      with_items:
+        - {a: tree,b: present,c: no}
+        - {a: git,b: absent,c: no}
+        - {a: maven,b: latest,c: yes}
+...
+
+handliers:
+handlers are tasks that run only when notified
+if any changes is apply to the code at that time ansible handler will tregger and code will exquate
+ mainly handler will do restat,sop,start the services.
+examples;
+
+        ---
+- name: implemting handlers
+  hosts: all
+  become: true
+  become_user: root
+  tasks:
+    - name: install httpd server
+      yum:
+        name: httpd
+        state: absent
+    - name: edit index.html
+      copy:
+        content: "good,ilove,i am fresher"
+        dest: /var/www/html/index.html
+      notify: restart apache
+  handlers:
+    - name: restart apache
+      service:
+        name: httpd
+        state: restarted
+    - name: check url
+      uri:
+        url: "{{item}}"
+        status_code: 200
+      with_items:
+        - http://10.1.2.124
+        - http://10.1.2.240
+...
+
+ex2:
+---
+- name: to create handlers
+  hosts: all
+  become: true
+  become_user: root
+  tasks:
+    - name: create nginx
+      yum:
+        name: nginx
+        state: absent
+      notify: start nginx
+  handlers:
+    - name: start nginx
+      service:
+        name: nginx
+        state: started
+
+
+include:
+call child play books from the parent play book
+
+vim clidcopy.yml
+---
+- name: copy file
+  copy:
+     src: tomcat-users.xml
+     dest: /tmp
+...
+
+
+
+ex2:
+child playbooks
+
+vim installapache.yml
+
+---
+-name: install application
+ apt:
+  name: apache2
+  state: present
+  update_cache: yes
+...
+
+vim editindex.html .yml
+ 
+---
+- name: edit the indes filr
+  copy:
+   content: "hai ra mama"
+   dest: /var/www/html/index.html
+...
+
+vim restrst.yml
+---
+- name: restart apache
+  service:
+   name: apache2
+   state; restarted
+ ...
+
+parent playbook
+vim install.yml
+  ---
+   - name: install apache
+     hosts; all
+     tasks:
+       -name: call child playbook
+         include: "{{item}}"
+        with_items:
+           - installapache.yml
+           - editindex.html 
+           - restrst.yml
+ansible vault;
+ansible vault is used to protect the playbooks using passwords.
+playbooks create using vault can be view,edit or exectue only if we have password.
+
+to create a vault playbook
+ansible-vault create playbook_name.yml
+to view the content of the playbook
+ansible-vault view playbookname
+to edit the content of the file used this command
+ansible-vault edit playbook_name
+to convert ordinery playbook into a vault play
+ansible-vault encrypt playbookname
+to convert vault playbook into ordinary file
+ ansible-vault decrpyt playbook name
+to reset the password of the vault
+ansible-vault rekey plybookname
+
+
+roles:
+roles are predefined folder structure
+roles are well defined framework and structure for setting your tasks.
+roles is also called as child playbooks from roles
+
+a role directory structure containes directies:default,vars,files,templates,metadata,handerlers
+1)readme:it used to store data about your roles
+2)default: it containes default variables for the roles .it has the loest priorty ,easly can override the variables
+3)vars: it is used to store the variables in roles,it has the higest priorty 
+4)tasks:task is the main list of steps to be exectuted by roles.
+5)handlers:handerlers are tasks that run only when notified
+6)metadata: it containes metadata of roles ,like author,support,platform
+7)files:files folder we are storing the files requred for over tasks,from controller to manager
+ 
+cd /etc/ansible/roles -> roles should be created in this path
+
+to create the role command is 
+ ansible-galaxy init apache --ofline
+
+ansible galaxy:
+is a galaxy website wher users can share roles and command line tool for installing creating and managing roles.
+
+
+ansible tower:
+ansible tower, now a days it is called as redhat ansible automation platform.
+ansible tower is web based gui tool,which you can manage your infrastructure centrally .
+ansible tower is enterprice , it free to use.
+
+advantages:
+1)clean dashboard
+2)manage inventry dynamially
+3)real time job status
+4)job scheduling
+5)self-service UI
+ 

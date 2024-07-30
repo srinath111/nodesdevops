@@ -1,0 +1,507 @@
+
++ docker swarm 
+============-
+ ->docker swarm is a container orchestration platform.it is used to manage docker container.
+ -> manage docker container nothing but creating/updating/scaling/remove container
+ ->docker swarm is used to setup of cluster 
+ ->cluster is nothing but group of severs
+ ->we no need to install seprate software it is inbuilt in docker.
+ ->we need to set up master and work node set using docker swarm container
+  ->master node is used to schulded the tasks and manage the container and fail over 
+  ->work node is used to follow the instraction of master nodes.
+ 
+->enable 2377 port in security group fo docker swarm communication.
+
+failover scenarios of manager:
+=============================
+If a worker instance crashed all the container running in that worker will be moved to master or another worker.
+
+If the manager it self crashed the swarm become headless,we cannot perform container orchestration activites in this swarm cluster.
+TO avoid this we will maintain multiple managers.
+manager nodes have the status as leader or reachable.
+
+if one manager goes down another manager will become leader ,QUORUM is resonsible for doing this activity.
+          
+QUORUM means it is used to maintain mininum of manager server .using a formula((n/2)+1)
+
+
+docker service :
+ docker service is used  for collection of one or more containers for some images
+
+  two types:
+   1)replica (default mode) it is used for increase or decrease  multiple container
+  2)global  ->LAUNCH CONTAINER IN EVERY NODE/HOSTS IS KNOWN AS GLOABAL
+
+scaling:if we want to incarease  or decrease a the containers based on the recurement we will use scaling.
+docker service scale container_name=No.OF ConTaiNER(4)
+
+
+constraint :run only on the manager or any specific work node
+ docker service create --name sri1 --constraint 'node.hostname==master' nginx
+
+labels:
+label are used to store data in key value 
+labels are used to add metadata to your docker image ,docker container exc....
+once data is added this labels allows you to filter your resources.
+example:
+docker node update --label-add  sdf=ssd node_name/worker_name
+
+Rolling updates:
+service running in docker swarm should be update from one version to another version without the enduser downtime.
+
+example1: 
+update redis:3 to redis:4 using rolling update
+docker service create --name myredis --replicas 3 redis:3
+
+docker service update --image redis:4 myredis
+
+rollback:
+service running in docker swarm should be decrease from one version to another version without the enduser downtime
+docker service create --name myredis --replicas 3 redis:4
+docker service update --image redis:3 myredis
+or 
+docker service update --rollback myredis
+
+network:
+overlay:
+  overlay network is default network for docker swarm.
+  and this network perform network load balancing.
+  overlay network is also known as ingress,it handles the control and data traffic related to docker swarm
+ docker_gwbridge:if the service is running on the specific woker ,we can access it from another work node.
+     docker_gwbridge -it is interconnect your servers.
+
+ ingress is created by docker,docker swarm uses the network to expose services to the external network and provide them routing mesh.
+ ingress network is used to expose service to the external network and provide them routing mesh.
+
+services mesh:interconnection beetween worker ,master,and container is known as service mesh
+to create docker swarm network
+docker network create --driver driver_name network_name 
+ex:
+ docker network cretae --driver overlay srinath
+to create docker swarm network on subnet
+docker network create --driver driver_name --subnet subnetid network_name
+ex:
+docker network cretae --driver overlay --subnet 10.1.2.0/24 srinath
+
+to update over network to the running container
+docker service update --network-add srinath sri     sri ->>container name ,srinath ->>network name
+to delete over network to the running container
+docker service update --network-rm  srinaTH SRI1
+ 
+
+1)to see the work nodes connected to master 
+ docker node ls
+2)to create a docker service of any image
+docker service create --name sri --replicas 5 --limit-cpu 0.5 --limit-memory 500mib nginx
+3)to see the running container
+ docker service ps container_name
+4)to rm the running container11111
+   docker servive rm container_name
+5)to remove the workers from the swram cluster 
+docker node update --avalibility drain worker_name
+6)to make the worker rejoin in the swarm
+ docker node update --avalibility active worker_name
+7)to work node want to leave the master
+ docker swarm leave
+  or 
+  docker swarm leave --force
+8)to generate token for machine to join swarm as worker.
+  docker swarm join-token worker
+9)TO GENERATE TOKEN FRO MACHINE TO JOIN SWARM AS MANAGER
+ DOCKER SWARM JOIN-token manager 
+10)to promate worker as a manager
+ docker node promate worker_name 
+11)to demote worker as a manager
+ docker node demote worker_name
+
+  
+node avabality :
+to remove the workers from the swram cluster 
+  docker node update --avalibility drain worker_name
+to make the worker rejoin in the swarm
+  docker node update --avalibility active worker_name
+to pause the worker from the swam cluster.
+ docker node update --avalibility pause worker_name
+to unpause the worker from the swam cluster.
+ docker node update --avalibility unpause worker_name
+
+
+resource requirements:
+limits:max
+
+reservations:min
+
+
+docker service create --limit-memory 300mib --reserve-cpu 1 --name sri --replicas 3 --p 4000:80 sreeharshav/stress:256M
+ 
+
+
+
+loadbalancing
+
+docker comands for aws networking 
+docker service create \
+--name traefik \
+--constraint=node.role==manager \
+--publish 80:80 \
+--publish 8080:8080 \
+--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
+--network srin \
+traefik:v1.6 \
+--docker \
+--docker.swarmmode \
+--docker.domain=traefik \
+--docker.watch \
+--web
+
+
+
+docker service create \
+--name www \
+--label traefik.port=80 \
+--network srin \
+--label traefik.frontend.rule=Host:web.srinath.shop \
+nginx \
+--replicas 4
+
+docker service create \
+--name app \
+--label traefik.port=80 \
+--network srin \
+--label traefik.frontend.rule=Host:app.srinath.shop \
+sreeharshav/rollingupdate:v1
+
+docker service create \
+--name app \
+--label traefik.port=80 \
+--network srin \
+--label traefik.frontend.rule=Host:app.srinath.shop \
+sreeharshav/testcontainer:v1
+
+
+configure logging drivers:
+docker includes multiple logging mechanisms to help you get information from running containers and services.These mechanisms are called logging drivers.
+
+
+
+docker config:
+used to pass or change configuration details to your container/application already in running state ,there are multiple ways to pass the config ,like env,config files
+
+example for env:
+docker service create --name sri --env AWS_secret=srinath AWS_access=raju -p 8080:80 --replicals 3 nginx
+
+if the conter is running ,now go and do this
+docker exec -it container_name printenv
+
+
+example for file:
+create index.html
+then create config file
+docker config create srinathk1 index.html
+
+then create a container and give config file 
+docker service create --name sri --config src=srinath1,target=/usr/share/nginx/html/index.html -p 7080:80 --replicas 3 sreeharshav/rollingupdate:v3  
+
+after that we can add new config to the existing config
+create a new config .
+index.html
+then create a config file 
+docker config create srinathk2 index.html
+then update the existing container
+docker service update --config-rm srinathk1 --config-add src=srinathk2,target=/usr/share/nginx/html/index.html sri
+
+
+
+docker secrets:
+
+this is the future of docker swarm using which we can pass secret data to the service running in swarm cluster.
+these secrets are created on the host machine and they will be avalible from all the replicas in the cluster.
+
+example1:
+echo " srinathk" | docker secret create mysec -
+
+to see docker sercets
+docker secret ls
+then create a container with secrets
+docker service create --name srinathkl --secret mysec -p 7007:80 --replicas 3 sreeharshav/rollingupdate:v3
+
+to see the secrets in docker contaier
+docker exec -it container_name/container_id ls /run
+
+Create 3 secrets for postgres user,password and db
+and pass them to the stack file
+
+1 Create secrets
+  echo "intelliqit" | docker secret create pg_password -
+  echo "myuser" | docker secret create pg_user -
+  echo "mydb" | docker secret create pg_db -
+
+2 Check if the secrets are created
+  docker secret ls
+
+3 Create the docker stack file to work on these secrets
+  vim stack6.yml
+---
+version: '3.1'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_password
+      POSTGRES_USER_FILE: /run/secrets/pg_user
+      POSTGRES_DB_FILE: /run/secrets/pg_db
+    secrets:
+     - pg_password
+     - pg_user
+     - pg_db
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    deploy:
+     replicas: 2
+
+secrets:
+    pg_password:
+     external: true
+    pg_user:
+     external: true
+    pg_db:
+     external: true
+
+...
+
+
+docker stack:
+docker stack is a combination of docker compose and docker swarm is known as docker stack.
+docker compose implement at level of docker swarm is known as docker stack.
+using docker stack we can create a micro services architecture at the level of production servers.
+
+to cereate the docker stack
+docker stack deploy -c filename stackname
+to see the docaker stack creted list
+docker stack ls
+to delete the docker stack
+docker stack rm stackname
+to see the full details of the docker stack 
+docker stack ps stackname
+
+example1
+vim stack1.yml
+---
+version: '3.8'
+services:
+  myab:
+    image: karaboina1/newimage
+    ports:
+      - 8100:8080
+    deploy:
+      replicas: 4
+      placement:
+        constraints:
+          - node.hostname == work1
+...
+
+example2:
+vim volume.yml
+---
+version: '3.8'
+services:
+  myvol:
+    image: nginx
+    ports:
+      - 9000:80
+    volumes:
+      - /var/lib/docker/volumes/sri/_data:/usr/share/nginx/html/
+
+volumes:
+  sri:
+    external: true
+
+
+example 3:
+vim network.yml
+---
+version: '3.8'
+services:
+	mynginx:
+		image: nginx
+		ports: 
+			- 8080:80
+		network:
+			- srinathnetwork
+                deploy:
+		     replicas: 3
+		     resources:
+			limits:
+			    cpu: 2
+			    memory: "300M"
+networks:
+ default:
+	external:
+		name: srinath
+
+
+UseCase
+================
+Create a docker stack file to start 3 replicas of wordpress
+and one replica of mysql
+
+vim stack1.yml
+---
+version: '3.8'
+
+services:
+ db:
+  image: "mysql:5"
+  environment:
+   MYSQL_ROOT_PASSWORD: intelliqit
+
+ wordpress:
+  image: wordpress
+  ports:
+   - "8989:80"
+  deploy:
+   replicas: 3
+
+To start the stack file
+docker stack deploy -c stack1.yml mywordpress
+
+To see the services running
+docker service ls
+
+To check where the serives are running
+docker stack ps mywordpress
+
+To delete the stack
+docker stack rm mywordpress
+
+
+=====================================================================
+UseCase
+==============
+Create a stack file to setup CI-cd architecture where a jenkins
+container is linked with tomcats for qa and prod environments
+The jenkins contianers should run only on Manager
+the qaserver tomcat should run only on Worker1 and prodserver
+tomcat should run only on worker2
+
+vim stack2.yml
+---
+version: '3.8'
+
+services:
+ myjenkins:
+  image: jenkins/jenkins
+  ports:
+   - 5050:8080
+  deploy:
+   replicas: 2
+   placement:
+    constraints:
+     - node.hostname == Manager
+
+ qaserver:
+  image: tomcat
+  ports:
+   - 6060:8080
+  deploy:
+   replicas: 3
+   placement:
+    constraints:
+     - node.hostname == Worker1
+
+ prodserver:
+  image: tomcat
+  ports:
+   - 7070:8080
+  deploy:
+   replicas: 4
+   placement:
+    constraints:
+     - node.hostname == Worker2
+...
+
+To start the services 
+docker deploy -c stack2.yml ci-cd
+
+To check the replicas 
+docker stack ps ci-cd
+
+==============================================================================
+Day 16
+==============================================================================
+UseCase
+Create a stack file to setup the selenium hub and nodes architecture
+but also specify a upper limit on the h/w
+
+vim stack3.yml
+---
+version: '3.8'
+
+services:
+ hub:
+  image: selenium/hub
+  ports:
+   - 4444:4444
+  deploy:
+   replicas: 2
+   resources:
+    limits:
+     cpus: "0.1"
+     memory: "300M"
+
+ chrome:
+  image: selenium/node-chrome-debug
+  ports:
+   - 5901:5900
+  deploy:
+   replicas: 3
+   resources:
+    limits:
+     cpus: "0.01"
+     memory: "100M"
+
+ firefox:
+  image: selenium/node-firefox-debug
+  ports:
+   - 5902:5900
+  deploy:
+   replicas: 3
+   resources:
+    limits:
+     cpus: "0.01"
+     memory: "100M"
+
+
+
+
+
+
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+
+diffrence between docker swarm and kubernetes?
+
+Docker swarm:
+->setup of the docker swarm is easy 
+->docker swarm does not support any autoscalling feature
+-> docker swarm is centrlized ,single node manager with a built-in data store
+->it is designed for smaller to medium-size cluster(up to 1000 nodes)
+
+kuberntes:
+->setup of the kubernets is somewhat deficult ,it has high avalibility
+->kubernetes supports automatic feature
+->kubernetes is decentrlized master-slave architecture with in etcd as the distributed data store.
+->it is designed for large scale work environments 

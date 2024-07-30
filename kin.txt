@@ -1,0 +1,375 @@
+what is kubernetes?
+->kubernetes is a open source orchestation tool, it was developed by google , then they did it as open source any one can use.
+->orchestaion tool is used to manage container. manage container is nothing but scalling,updating,autoscaling etc
+->the first version of the kubernetes is relased in 2015.
+
+what is kubernetes cluster?
+->kubernetes cluster is noyhing group of servers, user kubernetes clusetr we need to setup master node and worker node setup.
+->master node is used to schedule the tasks and handle the errors on kubernetes
+->worker node is used to follow the instractions of master node.
+
+
+what is diffrence between docker swarm and kubernetes?
+->docker swarm is docker container orchestation tool. setup of the docker swarm is easy.
+->docker swarm cannot handle the auto scaling 
+
+kubernetes:
+-> kubernetes is orchestation tool . setup of the kubernetes cluser is some wat dufficlt  for highly avalible.
+->kubernets can handle the auto scalling
+
+
+explain about kubernetes architecture?
+kubernetes is combination of two componentes:
+1)master componentes
+2)worker componentes
+
+master componentes are :
+1)container run time
+2)api server
+3)scheduler
+4)controller manager
+5)etcd
+
+worker componentes are:
+1)containerer run time 
+2)kubelet
+3)kube proxy
+
+
+1)container run time: this can be docker or any other conatinerization technology
+2)api server: api server acts as gateway to the cluster, apiserver will handle the incomming traffic from thge control panel
+3)scheduler: scheduler will accepts the instraction from the api server after valditing.
+             -> start application on the specific node or set of nodes
+		-> kubelet well deploy application on the worker node based onthe worker nodes space or storage
+4)controller manager: it is used to maintain the desired state of the container.
+5)etcd: it is used to store the full details of the worker node and master node.
+6)kubelet: It is a worker node agent. It will maintain all the information related to Worker Node.
+7)kube proxy: It will provide network for K8S cluster communication (Master Node <---> Worker Nodes)
+
+
+what kubernetes defination file or manifest?
+there are four important fileds.
+1)apiversion:every kubernetes objects uses a specific kubernetes code library that is called apiversion, once the code libray is imported we can start working on specified objects
+2)kind:kind is used to specify the objects ,like pod,service,replicaset etc...
+3)metadata:metadata is used to store more information about the objects.
+4)spec: It is used to store information about the docker images, container, volume etc..
+
+kind         			  apiversion
+1)pod					v1
+2)service				v1
+3)replicacontroller			v1
+4)sertets				v1
+5)replicaset				apps/v1
+6)Deployment				apps/v1
+7)demonset				apps/v1
+8)stateful				apps/v1
+9)persistent volume			v1
+10)persistent volume claim		v1
+11)name space				v1
+
+
+
+
+kubernetes objects:
+1)pod
+2)service
+3)replica controller
+4)replicaset
+5)deploymnet
+6)demonset
+7)node affinity
+8)
+
+
+
+1)pod:
+
+     ->pod is a layer of abstraction on top of the container.
+     ->pod is smallest object that kubernetes can work on
+	->in pod we have container.
+	-> the advantage of using pod is ,kublet commands will work on pod, pod will communicate the instractions to the container.
+example:
+---
+apiVersion: v1
+kind: Pod
+metadata:
+   name: srinathk1
+   labels:
+	author: sri
+spec:
+  containers:
+     - name: srinathcontainer
+       image: srinathkoraboina4:python:v1
+       ports: 
+	    - containerPort: 8080
+...
+
+# To all get all pods which are created
+$ kubectl get pods
+
+# To create pod using pod manifest yml
+$ kubectl apply -f <pod-manifest-yml>
+
+# Checking pod creation status
+$ kubectl get pods
+
+# To describe the pod information
+$ kubectl describe pod <pod-name>
+
+# To get pod logs
+$ kubectl logs <pod-name>
+
+# To check in which node pod is running
+$ kubectl get pods -o wide
+
+2)service:
+   it is used for network port mapping and network load balancing
+   there are three types of services:
+   1)ClusetrIP
+   2)NodePort
+   3)LoadBalancer
+
+ 1)cluster ip:
+   it is used for internal communication , it is not used for external communication.
+   cluserip is default type of service objects used in kubernetes.
+example:
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+   name: srinathk1
+   labels:
+	author: sri
+spec:
+  containers:
+     - name: srinathcontainer
+       image: srinathkoraboina4:python:v1
+       ports: 
+	    - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+	name: srinathk1service
+	labels:
+	    author: sri
+spec:
+	type: ClusterIP
+        selector:
+            author: sri
+	ports:
+	    - containerPort: 8080
+            - port: 8080
+...
+
+
+$ kubectl get svc
+
+$ kubectl apply -f <service-manifest-yml>
+
+$ kubectl get svc
+
+
+
+2)NODEPORT:
+  ->it used for network loadbalancing and it is used to expose our application to external network. 
+  ->even if pod running on the specified worker node we can access it from other node or cluster node
+ example:
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: srinathk1
+    labels:
+        author: srinath
+spec:
+   containers:
+        - name: srinathcontainer
+          image: srinathkoraboina:python:v1
+	  ports:
+	    - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+     name: srinathservice
+spec:
+   type: NodePort
+   selector:
+        author: srinath
+   ports:
+       - ports: 8080
+         containerPort: 8080
+         nodePort: 30024
+...
+
+3)LoadBalncing:
+    -> it used for network loadbalancing .
+    -> it will assign one public ip  to all the worker node
+    -> it is mainaly used on the managed kubernets service like (AKS,EKS,GKS)
+
+
+
+NameSPace:
+namespace is used to create a partitions in the cluster.
+if container/pod is running on the one namespace ,it will not communicate to anthoer pod running in another namespace.
+
+there are four default types of name space:
+1)default
+2)kube-syatem
+3)kube-public
+4)kube-node-lease
+
+
+to craete name space in the cluster command is:
+kubectl create ns namespace_name(srinath)
+to see the pods running on the namespace
+kubectl get pods -n srinath
+to see default namespaces:
+ kubectl get pods
+to delete the name space commad is :
+kubectl delete ns  srinath
+to delete all the name spaces in the cluster
+   kubectl delete all --all
+to see the logs of the pod running in name space:
+kubctl log podname -n srinath
+
+
+to create a namespace using defination file or manfest
+example:
+---
+apiVersion: v1
+kind: NameSpace
+metadata:
+     name: srinath
+...
+
+kubectl apply -f <filename>
+
+
+labels: are used to store more information about the object
+selector:
+   selector is used to select the object using labels
+    there are two types of selector:
+     1)matchLabels
+     2)matchexpressions
+
+
+replicaController:
+ -> it is used to manage multiple replicas of pods and it also perform loadbalacing and  scaling
+ -> replicaController uses two key words like: replicas and template
+-> replicacontoller will support equal based selector
+
+-> in template keyword there are two fileds 
+     1)metadata
+      2)spec
+
+
+example:
+---
+apiVersion: v1
+Kind: ReplicaController
+metadata: 
+   name: srinath
+   lables:
+      author: srinath
+spec:
+   replicas: 3
+   selector:
+       author: srinath
+   templates:
+         metadata:
+             name: srianth
+             labels:
+		author: srinath
+         spec:
+            containers:
+		  - name: srinathcontainer
+		    image: srinathkoraboina:python:v1
+                    ports:
+                       - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: srinathservice
+spec:
+   type: NodePort
+   selector:
+       author: srinath
+   ports:
+       - port: 8080
+         nodePort: 30226
+...
+
+
+
+to deploy the file:
+kubectl apply -f <filename>
+to see the pods
+kubectl get pods
+to see pods in detail
+kubectl describe pod podname
+to check pod is running on
+kubectl get pods -o wide 
+
+to scale the continer
+ there are two ways
+  1)change in the defination file
+  2)using kubectl command
+   
+
+1)change in the defination file
+ commd to reinstall the defination file ;
+   kubectl replace -f <filename>
+2)using kubectl command;
+  kubectl scale --replicas=4 -f <filename>
+
+
+REPLICASET:
+-> it is used to manage the replicas of pods, and it can also perform loadbalancing and scalling
+-> replicaset supports "set base selctors"
+ -> in the selector we have child element called as matchLables
+
+example:
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+	name: srinath
+	lables:
+	     author: srinath
+spec:
+   replicas: 3
+   selector:
+     matchLables:
+        author: srinath
+     template:
+	   metadata:
+               name: srinath
+               labels:
+                    author: srinath
+           spec:
+	       containers:
+			- name: containername
+			  image: srinathk0oraboina/python:v2
+			  ports:
+			     - containerPort: 9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+     name: srinathservice
+spec:
+   type: NodePort
+   slector:
+      author: srinath
+   ports:
+	- port: 8080
+	  nodePort: 30023
+...
+          
+
+
+
