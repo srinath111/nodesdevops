@@ -15,6 +15,9 @@ Kubernetes HA Set up  (Multi Node Cluster with kubeadm)
 		2 Worker Nodes :  t2.medium
 
 step1: 
+sudo apt-get update
+sudo apt-get install -y docker.io
+
 # Upgrade apt packages
 $ sudo apt-get update
 
